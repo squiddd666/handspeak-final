@@ -1,0 +1,9 @@
+/* Direct, locally hosted reference photos; show the entire hand without cropping. */
+#signGrid .sign-visual.sign-photo,
+#numberGrid .sign-visual.sign-photo {height:auto;aspect-ratio:3 / 4;overflow:hidden;background:#845127;}
+#signGrid .sign-photo img,
+#signGrid .sign-photo video,
+#numberGrid .sign-photo img,
+#numberGrid .sign-photo video {display:block;width:100%;height:100%;object-fit:contain;}
+.sign-group-title {margin:42px 0 18px;font:600 22px/1.2 Manrope;letter-spacing:-.03em;}
+.sign-photo-credit {color:#aab5a2;font-size:12px;line-height:1.6;margin:18px 0 0;max-width:850px;}

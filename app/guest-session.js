@@ -1,0 +1,1 @@
+fetch('/api/auth/me').then(response=>response.ok?response.json():null).then(data=>{if(data?.user)document.querySelector('#historyPrivacy').textContent='Saved history is private to your existing account session.';}).catch(()=>{});

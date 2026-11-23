@@ -1,0 +1,29 @@
+[Unit]
+Description=HandSpeak v1 isolated deployment
+After=network.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+WorkingDirectory=/srv/handspeak-v1
+BindReadOnlyPaths=/root/HandSpeak-Deployment:/srv/handspeak-v1
+ExecStart=/usr/bin/python3 /srv/handspeak-v1/start.py
+Environment=HOST=127.0.0.1 PORT=8001 HANDSPEAK_DATA_DIR=/var/lib/handspeak-v1 PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+StateDirectory=handspeak-v1
+StateDirectoryMode=0700
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

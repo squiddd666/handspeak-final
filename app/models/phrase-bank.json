@@ -1,0 +1,498 @@
+{
+  "schema": "handspeak-phrase-bank-v1",
+  "version": 1,
+  "generated": "2026-11-14",
+  "status": "draft: no page or module loads this file",
+  "note": "Application-defined mappings from an ordered sequence of sign labels to a stored English sentence. This is not translation, and a sequence listed here is not claimed to be a grammatical sentence of American Sign Language. No fluent signer has reviewed the sequences, their order or the English outputs.",
+  "labelNote": "A sign is named in signs by its label id: the word recognizer's label in upper case with single spaces (I / ME, THANK YOU, FOOD, FINISH). display is the name shown to the user. An alias is another name for the same sign and is replaced by its label id before matching. FOOD and EAT are one sign: 20 names, 19 signs.",
+  "outputNote": "A match gives the phrase id, english, and glosses (one written gloss per sign, in order). glossLine is the same sequence as one line for display, with a question mark where the phrase is stored as a question.",
+  "tiers": {
+    "A": "isolated phone-game recordings of many signers, one-handed",
+    "B": "a small number of isolated clips, and sentence segments",
+    "C": "sentence segments only; no isolated recording",
+    "D": "no isolated recording on disk; a few sentence segments"
+  },
+  "matching": {
+    "rule": "A phrase matches when the completed sequence of label ids, after aliases are replaced, equals its signs or the signs of one of its variants, in order and in full. Anything else gives no output.",
+    "activeOnly": "Only phrases with active true may be matched. A phrase is active only while every one of its signs can be demonstrated; PB-08 to PB-15 are inactive until that is decided.",
+    "variantOutput": "A variant gives the id and english of its phrase and its own glosses.",
+    "prefixFree": true,
+    "prefixFreeNote": "Checked on 2026-11-14 over the 17 sequences of this file (15 phrases and 2 variants): no sequence is the beginning of another and no two are equal, with or without the inactive phrases. The variants do not break this. A phrase of a single YES, NO, WATER, PLEASE, WHERE, YOU or STOP would break it, so the property has to be checked again whenever a phrase or a variant is added."
+  },
+  "labelsInNoPhrase": [
+    "GOOD",
+    "WHAT"
+  ],
+  "labels": {
+    "HELLO": {
+      "display": "HELLO",
+      "aliases": [],
+      "tier": "A"
+    },
+    "THANK YOU": {
+      "display": "THANK YOU",
+      "aliases": [
+        "THANKYOU"
+      ],
+      "tier": "A"
+    },
+    "PLEASE": {
+      "display": "PLEASE",
+      "aliases": [],
+      "tier": "A"
+    },
+    "YES": {
+      "display": "YES",
+      "aliases": [],
+      "tier": "A"
+    },
+    "NO": {
+      "display": "NO",
+      "aliases": [],
+      "tier": "A"
+    },
+    "FINISH": {
+      "display": "FINISHED",
+      "aliases": [
+        "FINISHED"
+      ],
+      "tier": "A",
+      "note": "Every model and source file names this sign FINISH; FINISHED is the name shown."
+    },
+    "WATER": {
+      "display": "WATER",
+      "aliases": [],
+      "tier": "A"
+    },
+    "FOOD": {
+      "display": "FOOD",
+      "aliases": [
+        "EAT",
+        "EAT / FOOD"
+      ],
+      "tier": "A",
+      "note": "FOOD and EAT are one sign and one class with two names. The extra-word templates and the 17-word network give the label FOOD; a 19-class list uses the class name EAT / FOOD."
+    },
+    "GO": {
+      "display": "GO",
+      "aliases": [],
+      "tier": "A"
+    },
+    "WHERE": {
+      "display": "WHERE",
+      "aliases": [],
+      "tier": "A"
+    },
+    "WANT": {
+      "display": "WANT",
+      "aliases": [],
+      "tier": "B"
+    },
+    "NEED": {
+      "display": "NEED",
+      "aliases": [],
+      "tier": "B"
+    },
+    "HELP": {
+      "display": "HELP",
+      "aliases": [],
+      "tier": "B"
+    },
+    "GOOD": {
+      "display": "GOOD",
+      "aliases": [],
+      "tier": "B",
+      "note": "In no phrase: the one-handed form is a documented look-alike of THANK YOU."
+    },
+    "WHAT": {
+      "display": "WHAT",
+      "aliases": [],
+      "tier": "B",
+      "note": "In no phrase: exchanged with WANT in the records. Where it is used, the sign meant is the open-hand form, not the index finger across the palm."
+    },
+    "I / ME": {
+      "display": "I / ME",
+      "aliases": [
+        "I",
+        "ME"
+      ],
+      "tier": "C",
+      "note": "One sign for both English words."
+    },
+    "YOU": {
+      "display": "YOU",
+      "aliases": [],
+      "tier": "C"
+    },
+    "STOP": {
+      "display": "STOP",
+      "aliases": [],
+      "tier": "D"
+    },
+    "MORE": {
+      "display": "MORE",
+      "aliases": [],
+      "tier": "D"
+    }
+  },
+  "phrases": [
+    {
+      "id": "PB-01",
+      "signs": [
+        "HELLO"
+      ],
+      "glosses": [
+        "HELLO"
+      ],
+      "glossLine": "HELLO",
+      "english": "Hello.",
+      "tiers": [
+        "A"
+      ],
+      "active": true,
+      "orderSource": "Single sign.",
+      "variants": [],
+      "validationNote": "None noted."
+    },
+    {
+      "id": "PB-02",
+      "signs": [
+        "THANK YOU"
+      ],
+      "glosses": [
+        "THANK-YOU"
+      ],
+      "glossLine": "THANK-YOU",
+      "english": "Thank you.",
+      "tiers": [
+        "A"
+      ],
+      "active": true,
+      "orderSource": "Single sign.",
+      "variants": [],
+      "validationNote": "None noted."
+    },
+    {
+      "id": "PB-03",
+      "signs": [
+        "YES",
+        "PLEASE"
+      ],
+      "glosses": [
+        "YES",
+        "PLEASE"
+      ],
+      "glossLine": "YES PLEASE",
+      "english": "Yes, please.",
+      "tiers": [
+        "A",
+        "A"
+      ],
+      "active": true,
+      "orderSource": "English word order; no source for this order was read.",
+      "variants": [],
+      "validationNote": "If YES and NO are exchanged the output is the opposite answer (PB-04)."
+    },
+    {
+      "id": "PB-04",
+      "signs": [
+        "NO",
+        "THANK YOU"
+      ],
+      "glosses": [
+        "NO",
+        "THANK-YOU"
+      ],
+      "glossLine": "NO THANK-YOU",
+      "english": "No, thank you.",
+      "tiers": [
+        "A",
+        "A"
+      ],
+      "active": true,
+      "orderSource": "English word order; no source for this order was read.",
+      "variants": [],
+      "validationNote": "NO is often made with a small head shake, which the system does not read. If YES and NO are exchanged the output is the opposite answer (PB-03)."
+    },
+    {
+      "id": "PB-05",
+      "signs": [
+        "WATER",
+        "PLEASE"
+      ],
+      "glosses": [
+        "WATER",
+        "PLEASE"
+      ],
+      "glossLine": "WATER PLEASE",
+      "english": "Water, please.",
+      "tiers": [
+        "A",
+        "A"
+      ],
+      "active": true,
+      "orderSource": "English word order; no source for this order was read.",
+      "variants": [
+        {
+          "signs": [
+            "PLEASE",
+            "WATER"
+          ],
+          "glosses": [
+            "PLEASE",
+            "WATER"
+          ],
+          "glossLine": "PLEASE WATER",
+          "orderSource": "The order in which the guided course stores this sentence; no other source.",
+          "note": "Same output as the main order."
+        }
+      ],
+      "validationNote": "Some signers do not use PLEASE to make a request."
+    },
+    {
+      "id": "PB-06",
+      "signs": [
+        "WATER",
+        "WHERE"
+      ],
+      "glosses": [
+        "WATER",
+        "WHERE"
+      ],
+      "glossLine": "WATER WHERE?",
+      "english": "Where is the water?",
+      "tiers": [
+        "A",
+        "A"
+      ],
+      "active": true,
+      "orderSource": "Order found in an example sentence of a teaching source. The question word comes last.",
+      "variants": [
+        {
+          "signs": [
+            "WHERE",
+            "WATER"
+          ],
+          "glosses": [
+            "WHERE",
+            "WATER"
+          ],
+          "glossLine": "WHERE WATER?",
+          "orderSource": "English word order; no source for this order was read.",
+          "note": "Same output as the main order. Kept so that either order gives the phrase; a signer may reject it."
+        }
+      ],
+      "validationNote": "A question with WHERE is marked by furrowed brows, which a teaching source calls part of the sign. The system does not read the face: the output is a question only because this mapping says so."
+    },
+    {
+      "id": "PB-07",
+      "signs": [
+        "FOOD",
+        "FINISH"
+      ],
+      "glosses": [
+        "EAT",
+        "FINISH"
+      ],
+      "glossLine": "EAT FINISH",
+      "english": "Finished eating.",
+      "tiers": [
+        "A",
+        "A"
+      ],
+      "active": true,
+      "orderSource": "Order found in an example sentence of a teaching source.",
+      "variants": [],
+      "validationNote": "No subject is signed, so none is written. Made with one hand, FINISH is described by a teaching source as meaning stop it."
+    },
+    {
+      "id": "PB-08",
+      "signs": [
+        "I / ME",
+        "WANT",
+        "WATER"
+      ],
+      "glosses": [
+        "I",
+        "WANT",
+        "WATER"
+      ],
+      "glossLine": "I WANT WATER",
+      "english": "I want water.",
+      "tiers": [
+        "C",
+        "B",
+        "A"
+      ],
+      "active": false,
+      "orderSource": "English word order; no source for this order was read.",
+      "variants": [],
+      "validationNote": "WANT exchanged for WHAT breaks the phrase."
+    },
+    {
+      "id": "PB-09",
+      "signs": [
+        "I / ME",
+        "WANT",
+        "FOOD"
+      ],
+      "glosses": [
+        "I",
+        "WANT",
+        "FOOD"
+      ],
+      "glossLine": "I WANT FOOD",
+      "english": "I want food.",
+      "tiers": [
+        "C",
+        "B",
+        "A"
+      ],
+      "active": false,
+      "orderSource": "English word order; no source for this order was read.",
+      "variants": [],
+      "validationNote": "WANT exchanged for WHAT breaks the phrase."
+    },
+    {
+      "id": "PB-10",
+      "signs": [
+        "I / ME",
+        "NEED",
+        "HELP"
+      ],
+      "glosses": [
+        "I",
+        "NEED",
+        "HELP"
+      ],
+      "glossLine": "I NEED HELP",
+      "english": "I need help.",
+      "tiers": [
+        "C",
+        "B",
+        "B"
+      ],
+      "active": false,
+      "orderSource": "English word order; no source for this order was read.",
+      "variants": [],
+      "validationNote": "HELP can carry the meaning me by its direction, so a signer may leave out I / ME. NEED with a single movement is described as must."
+    },
+    {
+      "id": "PB-11",
+      "signs": [
+        "PLEASE",
+        "HELP"
+      ],
+      "glosses": [
+        "PLEASE",
+        "HELP"
+      ],
+      "glossLine": "PLEASE HELP",
+      "english": "Please help.",
+      "tiers": [
+        "A",
+        "B"
+      ],
+      "active": false,
+      "orderSource": "English word order; no source for this order was read.",
+      "variants": [],
+      "validationNote": "Help me is HELP moved toward the signer; the system cannot tell the direction. Some signers do not use PLEASE to make a request."
+    },
+    {
+      "id": "PB-12",
+      "signs": [
+        "YOU",
+        "WANT",
+        "FOOD"
+      ],
+      "glosses": [
+        "YOU",
+        "WANT",
+        "FOOD"
+      ],
+      "glossLine": "YOU WANT FOOD?",
+      "english": "Do you want food?",
+      "tiers": [
+        "C",
+        "B",
+        "A"
+      ],
+      "active": false,
+      "orderSource": "English word order; no source for this order was read.",
+      "variants": [],
+      "validationNote": "A yes-or-no question is marked by raised brows, which the system does not read; as a sequence of hand signs this is the same as the statement You want food. Signers often repeat YOU at the end of such a question."
+    },
+    {
+      "id": "PB-13",
+      "signs": [
+        "YOU",
+        "WANT",
+        "GO",
+        "WHERE"
+      ],
+      "glosses": [
+        "YOU",
+        "WANT",
+        "GO",
+        "WHERE"
+      ],
+      "glossLine": "YOU WANT GO WHERE?",
+      "english": "Where do you want to go?",
+      "tiers": [
+        "C",
+        "B",
+        "A",
+        "A"
+      ],
+      "active": false,
+      "orderSource": "Order found in an example sentence of a teaching source. The question word comes last.",
+      "variants": [],
+      "validationNote": "Four signs, the longest sequence. Question marking as in PB-06."
+    },
+    {
+      "id": "PB-14",
+      "signs": [
+        "YOU",
+        "WANT",
+        "MORE"
+      ],
+      "glosses": [
+        "YOU",
+        "WANT",
+        "MORE"
+      ],
+      "glossLine": "YOU WANT MORE?",
+      "english": "Do you want more?",
+      "tiers": [
+        "C",
+        "B",
+        "D"
+      ],
+      "active": false,
+      "orderSource": "Close to an example sentence of a teaching source, which puts YOU last.",
+      "variants": [],
+      "validationNote": "Question marking as in PB-12."
+    },
+    {
+      "id": "PB-15",
+      "signs": [
+        "STOP",
+        "PLEASE"
+      ],
+      "glosses": [
+        "STOP",
+        "PLEASE"
+      ],
+      "glossLine": "STOP PLEASE",
+      "english": "Please stop.",
+      "tiers": [
+        "D",
+        "A"
+      ],
+      "active": false,
+      "orderSource": "English word order; no source for this order was read.",
+      "variants": [],
+      "validationNote": "The one-handed FINISH is described as meaning stop it; the two may be taken for each other."
+    }
+  ]
+}

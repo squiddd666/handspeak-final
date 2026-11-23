@@ -1,0 +1,20 @@
+{
+  "checksPassed": [
+    "Python source parses",
+    "All local JavaScript import targets included",
+    "Package starts independently on localhost:8001",
+    "Health API returns 200",
+    "Letters/numbers/words mode changes",
+    "Simulated webcam starts and stops",
+    "Practice video plays",
+    "No browser JavaScript errors",
+    "No failed browser asset requests",
+    "390px mobile viewport has no horizontal overflow"
+  ],
+  "notTested": [
+    "Actual human signing accuracy",
+    "Docker build and public HTTPS (Docker unavailable locally)",
+    "Real-device camera permissions and audio"
+  ],
+  "privateDatabaseIncluded": false
+}

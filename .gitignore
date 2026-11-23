@@ -1,0 +1,8 @@
+.env
+data/
+__pycache__/
+*.pyc
+
+# Local source archives and deployment host details
+uploaded files/
+VM-DEPLOYMENT.json

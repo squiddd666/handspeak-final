@@ -1,0 +1,153 @@
+/* Recognition pace: the progress bar and states of the live result (#liveResult).
+   app.js sets data-pace on #liveResult and the custom property --hold (0 to 1).
+   States: reading, holding, added, done (letters); watching, checking, rest (words). */
+
+.live-result .live-progress {
+  display: block;
+  position: relative;
+  /* The card centres its children, which would shrink an empty block to nothing. */
+  align-self: stretch;
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 140px;
+  box-sizing: border-box;
+  height: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(127, 127, 127, .28);
+  overflow: hidden;
+}
+.live-result .live-progress > i {
+  display: block;
+  height: 100%;
+  width: calc(var(--hold, 0) * 100%);
+  border-radius: inherit;
+  background: currentColor;
+  transition: width .14s linear;
+}
+.live-result:not([data-pace]) .live-progress,
+.live-result[data-pace="none"] .live-progress,
+.live-result[data-pace="done"] .live-progress { display: none; }
+
+/* Calm changes: the card eases in, and the text eases between states instead of snapping.
+   The animations restart only when data-pace changes, never from frame to frame. */
+.live-result:not([hidden]) { animation: pace-in .28s ease-out; }
+.live-result #liveLetter,
+.live-result #liveConfidence { transition: opacity .28s ease; }
+.live-result[data-pace="holding"] #liveLetter,
+.live-result[data-pace="rest"] #liveLetter,
+.live-result[data-pace="none"] #liveLetter { animation: pace-fade .3s ease-out; }
+.live-result[data-pace="none"] #liveLetter { opacity: .7; }
+
+/* Nothing is decided yet: a moving segment, and the candidate text held back. */
+.live-result[data-pace="reading"] .live-progress > i,
+.live-result[data-pace="watching"] .live-progress > i,
+.live-result[data-pace="checking"] .live-progress > i {
+  width: 34%;
+  transition: none;
+  animation: pace-sweep 1.15s ease-in-out infinite;
+}
+.live-result[data-pace="reading"] #liveLetter,
+.live-result[data-pace="watching"] #liveLetter,
+.live-result[data-pace="checking"] #liveLetter { opacity: .5; }
+
+/* A candidate is being held: the bar fills to the commit. */
+.live-result[data-pace="holding"] #liveLetter { opacity: .82; }
+
+/* Committed: full bar, brief emphasis. */
+.live-result[data-pace="added"] .live-progress > i { width: 100%; background: #7bd88f; transition: none; }
+.live-result[data-pace="added"] #liveLetter { animation: pace-pop .32s ease-out; }
+
+/* Waiting before the next word capture: the bar drains over --rest-ms. */
+.live-result[data-pace="rest"] .live-progress > i {
+  width: 100%;
+  transition: none;
+  opacity: .55;
+  transform-origin: left center;
+  animation: pace-drain var(--rest-ms, 1800ms) linear forwards;
+}
+
+/* Opacity only: the card may be positioned with its own transform. */
+@keyframes pace-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pace-fade { from { opacity: .25; } }
+@keyframes pace-sweep { 0% { transform: translateX(-110%); } 100% { transform: translateX(320%); } }
+@keyframes pace-pop { 0% { transform: scale(.86); } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
+@keyframes pace-drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .live-result .live-progress > i { transition: none; animation: none !important; }
+  .live-result[data-pace="reading"] .live-progress > i,
+  .live-result[data-pace="watching"] .live-progress > i,
+  .live-result[data-pace="checking"] .live-progress > i { width: 100%; opacity: .45; }
+  .live-result[data-pace="rest"] .live-progress > i { opacity: .3; }
+  .live-result[data-pace="added"] #liveLetter { animation: none; }
+  .live-result:not([hidden]),
+  .live-result #liveLetter { animation: none !important; transition: none; }
+}
+
+/* "Did you mean…?" row under the camera status line (#wordChoices, filled by app.js). */
+.word-choices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px var(--pad, 22px) 12px;
+  animation: pace-in .28s ease-out;
+}
+.word-choices[hidden] { display: none; }
+.word-choices-lead { flex: 0 0 100%; font-size: .86rem; opacity: .8; }
+.word-choices .word-choice,
+.word-choices .word-choice-none {
+  font: inherit;
+  font-weight: 600;
+  min-height: 40px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.word-choices .word-choice { background: rgba(214, 232, 178, .16); }
+.word-choices .word-choice:hover,
+.word-choices .word-choice:focus-visible { background: rgba(214, 232, 178, .34); }
+.word-choices .word-choice-none { font-weight: 500; opacity: .75; border-style: dashed; }
+.word-choices .word-choice-none:hover,
+.word-choices .word-choice-none:focus-visible { opacity: 1; }
+
+/* Guided recording of the six built-in words (#wordGuide, built by word-teach.js). */
+.word-guide {
+  margin: 16px 0;
+  padding: 16px 18px;
+  border: 1px solid rgba(127, 127, 127, .35);
+  border-radius: 14px;
+}
+.word-guide h3 { margin: 0 0 6px; font-size: 1.05rem; }
+.word-guide-lead { margin: 0 0 12px; font-size: .9rem; opacity: .85; }
+.word-guide-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+.word-guide-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid rgba(127, 127, 127, .3);
+  border-radius: 10px;
+  font-size: .85rem;
+}
+.word-guide-item b { font-size: .92rem; }
+.word-guide-item span { opacity: .75; }
+.word-guide-item[data-state="current"] { border-color: currentColor; background: rgba(214, 232, 178, .12); }
+.word-guide-item[data-state="done"] { border-color: #7bd88f; }
+.word-guide-item[data-state="done"] span::before { content: "\2713\00a0"; color: #7bd88f; }
+.word-guide-item[data-state="skipped"] { opacity: .55; border-style: dashed; }
+.word-guide-status { min-height: 1.4em; margin: 0 0 10px; font-size: .9rem; }
+.word-guide-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+@media (prefers-reduced-motion: reduce) { .word-choices { animation: none; } }

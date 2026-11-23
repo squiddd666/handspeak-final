@@ -1,0 +1,20 @@
+{
+  "collection": "User-provided ASL number reference photos",
+  "sourceArchive": "uploaded files/numbers.rar",
+  "updated": "2026-11-22",
+  "items": [
+    {"number": 1, "file": "1.jpg", "archiveFile": "aa64e333-e75b-491b-aa03-5471978fc9c9.jfif"},
+    {"number": 2, "file": "2.jpg", "archiveFile": "52daac5b-8286-426d-bc7f-c751df529dee.jfif"},
+    {"number": 3, "file": "3.jpg", "archiveFile": "286bb688-aa9d-4c4e-abb3-e1f3cb4b4109.jfif"},
+    {"number": 4, "file": "4.jpg", "archiveFile": "cf6f6eeb-b0ba-45a0-9b57-bdf8d6921924.jfif"},
+    {"number": 5, "file": "5.jpg", "archiveFile": "da1be26c-a504-4879-9ee3-0e2fcde117b7.jfif"},
+    {"number": 6, "file": "6.jpg", "archiveFile": "ac2fa999-4a2e-4195-ac76-12bc98297979.jfif"},
+    {"number": 7, "file": "7.jpg", "archiveFile": "77e23a18-52ce-426c-82b1-bdcf47553f1c.jfif"},
+    {"number": 8, "file": "8.jpg", "archiveFile": "81140771-8414-4bfa-a0a8-b44a377850af.jfif"},
+    {"number": 9, "file": "9.jpg", "archiveFile": "85af52db-3803-4a7b-95c7-9ac1c0bfd625.jfif"}
+  ],
+  "notes": [
+    "The UUID-named photos are matched to digits by the displayed handshapes.",
+    "Portrait crops focus on the hand while keeping the full gesture visible. Optimized JPEGs are served locally from this deployment."
+  ]
+}

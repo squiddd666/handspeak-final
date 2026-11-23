@@ -1,0 +1,27 @@
+{
+  "collection": "User-provided A-Z ASL reference photos and motion clips",
+  "source": "https://drive.google.com/drive/folders/1b2oip5_byYX0P6hGxZbnIOFEdv0uc7Ue",
+  "items": [
+    {
+      "letters": "A-I and K-Y",
+      "files": "a.jpg through i.jpg and k.jpg through y.jpg",
+      "description": "Replacement still references from the Drive download uploaded on 2026-11-22."
+    },
+    {
+      "letter": "J",
+      "filename": "j.mp4",
+      "poster": "j.jpg",
+      "description": "Replacement motion reference from the Drive download uploaded on 2026-11-22; poster extracted from the clip."
+    },
+    {
+      "letter": "Z",
+      "filename": "z.mp4",
+      "poster": "z.jpg",
+      "description": "Replacement motion reference from the Drive download uploaded on 2026-11-22; poster extracted from the clip."
+    }
+  ],
+  "notes": [
+    "A-I and K-Y stills are locally optimized JPEGs derived from the provided files.",
+    "J and Z motion clips are served locally, with poster images extracted from each clip."
+  ]
+}
