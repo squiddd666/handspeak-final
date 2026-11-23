@@ -316,12 +316,12 @@ let handVision,handFiles,handRecovery=null;
 const DEFAULT_LETTER_HANDS=1;
 const LETTER_HANDS=(value=>value==='1'?1:value==='2'?2:DEFAULT_LETTER_HANDS)(pageOption('letterHands'));
 const letterHandChoice=createLetterHandChoice();
-// Which hand the signer said they sign with: 'auto' (either), 'right' or 'left'. The page asks when
-// needed via the Signing hand control. With two hands tracked
-// (?letterHands=2) the letters are read from that hand; with one hand tracked the page reads the
-// hand the tracker follows. It does not change how a hand is compared with the references:
+// Which hand the signer selected: 'auto' (either), 'right' or 'left'. The optional query setting is
+// only used with two hands tracked (?letterHands=2); with one hand tracked the page reads the hand
+// the tracker follows. It does not change how a hand is compared with the references:
 // comparing one orientation only was measured and lost correct letters.
-let signingHand='auto';
+const requestedSigningHand=pageOption('signingHand');
+const signingHand=requestedSigningHand==='right'||requestedSigningHand==='left'?requestedSigningHand:'auto';
 // Hands at the edge of the picture (hand-view.js). A hand that is partly outside stays drawn. In
 // the letters mode a hand that reaches no further outside than EDGE_MARGIN is still read, and a
 // hand with several points at the edge is taken to be cut off and is not read (isCutOff).
@@ -485,7 +485,6 @@ function setRecognitionMode(mode,keepResearch=false){
   $('#recognitionMode').value=mode==='letters'?signSet:mode;
   $('#captureMode').textContent=recognitionMode==='words'?'WORDS IN MOTION':signSet==='numbers'?'NUMBERS':'LETTERS';
   $('#wordOutputLabel').hidden=recognitionMode!=='words';renderCaption();
-  $('#signingHandLabel').hidden=recognitionMode!=='letters';
   
   $('#pipelineMatch').classList.toggle('active',recognitionMode==='words');
   candidate='';candidateSince=0;committed='';
@@ -1286,20 +1285,6 @@ $('#wordOutput').addEventListener('change',()=>setWordOutput($('#wordOutput').va
 // Speaks the newest word again: like Speak message, only on a press.
 $('#speakWordButton').addEventListener('click',()=>{const word=newestWord();if(!word)return notify('Add a word first');speakText(word);});
 {let storedOutput=null;try{storedOutput=localStorage.getItem('handspeak-word-output');}catch{}setWordOutput(storedOutput,false);$('#wordOutputLabel').hidden=recognitionMode!=='words';}
-// The signing hand is remembered in this browser; the control is shown in the letters mode only.
-function setSigningHand(value,remember=true){
-  signingHand=value==='right'||value==='left'?value:'auto';
-  $('#signingHand').value=signingHand;letterHandChoice.reset();
-  if(remember){try{localStorage.setItem('handspeak-signing-hand',signingHand);}catch{}}
-}
-// Choose a signing hand only through the existing settings control.
-$('#signingHand').addEventListener('change',event=>setSigningHand(event.target.value));
-{
-  const given=pageOption('signingHand');let storedHand=null;try{storedHand=localStorage.getItem('handspeak-signing-hand');}catch{}
-  if(given==='right'||given==='left'||given==='either'){setSigningHand(given,false);}
-  else setSigningHand(storedHand,false);
-  $('#signingHandLabel').hidden=recognitionMode!=='letters';
-}
 loadSystemData();
 renderAIStatus();
 loadPretrainedModel();

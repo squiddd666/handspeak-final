@@ -28,10 +28,6 @@ body.high-contrast{--cream:#fff;--paper:#fff;--ink:#000;--teal:#004b4d;--muted:#
 .motion-section{max-width:1180px;margin:56px auto}
 @media(max-width:800px){.ai-section{grid-template-columns:minmax(0,1fr);padding:24px 18px}.ai-section .trainer-card{min-width:0}.trainer-heading{flex-wrap:wrap;gap:12px}.trainer-label select{max-width:100%}}
 
-/* The signing-hand question, shown over the camera picture when the camera is started in the letters or numbers mode. */
-.hand-question{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:10px;width:min(88%,340px);padding:18px 20px;border-radius:14px;background:rgba(12,28,25,.92);color:#fff;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-.hand-question[hidden]{display:none}.hand-question strong{font-size:17px}.hand-question span,.hand-question small{font-size:13px;opacity:.85}
-.hand-question-choices{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}.hand-question-choices button{min-height:44px;padding:0 18px}.hand-question-choices button[aria-pressed="true"]{outline:2px solid #7fe0ca;outline-offset:2px}
 /* Undo beside Clear all, and the camera chooser in Camera settings. */
 .output-card .draft-actions{display:flex;flex:none;align-items:center;gap:14px}
 .camera-device-choice{display:inline-flex;align-items:center;gap:8px}.camera-device-choice select{max-width:220px}
