@@ -67,8 +67,8 @@
     },
     {
       "path": "app/guided-experience.js",
-      "bytes": 4098,
-      "sha256": "217f4db9c0b6c77900297118fe3b3b16a97dab1fed7d8814623dfc57f4a00383"
+      "bytes": 4132,
+      "sha256": "459ed1fd7b8d2f20aa92d8b8c6d983bbd06c6e66fddbea1132b690c041f805cc"
     },
     {
       "path": "app/hand-detection-worker.js",
@@ -92,8 +92,8 @@
     },
     {
       "path": "app/index.html",
-      "bytes": 36665,
-      "sha256": "74bdc2fa6ac8c1b558e8bbf0d24cb4a15f523d2012d3739b3ad2081c85605044"
+      "bytes": 36640,
+      "sha256": "46c1c8a0aaff44c5198f3fb979b9158e1a3e8384f3d425f34dd52a4995a4ea41"
     },
     {
       "path": "app/landmark-smoothing.js",
