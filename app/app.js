@@ -2,6 +2,7 @@ import {createLetterCamera} from './letter-camera.js?v=20261113-refined-1';
 import {classifyLetter,letterFeatures,isUsableLetterHand,sameObservedHand,createLetterConsensus} from './letter-recognition.js?v=20261113-refined-1';
 import {createMultiHandMotionLetters} from './motion-letters.js?v=20261111-motion-geometry-1';
 import {createExperienceUI} from './experience-ui.js?v=20261112-feedback-labels-1';
+import {COMMON_WORDS,wordsInMessage} from './letter-words.js?v=20261114-letter-words-1';
 import {loadVocabularySettings} from './vocabulary-settings.js?v=20261011-features-1';
 import {createTemporalCamera} from './temporal-camera.js?v=20261112-local-runtime-1';
 import {preferredVisionDelegate} from './camera-performance.js?v=20261010-single-1';
@@ -483,6 +484,9 @@ function setRecognitionMode(mode,keepResearch=false){
     stopCamera();handLandmarker?.close?.();handLandmarker=null;
   }
   $('#recognitionMode').value=mode==='letters'?signSet:mode;
+  document.querySelectorAll('[data-recognition-mode]').forEach(button=>{
+    button.setAttribute('aria-pressed',String(button.dataset.recognitionMode===$('#recognitionMode').value));
+  });
   $('#captureMode').textContent=recognitionMode==='words'?'WORDS IN MOTION':signSet==='numbers'?'NUMBERS':'LETTERS';
   $('#wordOutputLabel').hidden=recognitionMode!=='words';renderCaption();
   
@@ -503,6 +507,12 @@ $('#recognitionMode').addEventListener('change',event=>{
   setRecognitionMode(event.target.value);
   if(wasLive&&!running&&!cameraStarting)void startCamera();
 });
+document.querySelectorAll('[data-recognition-mode]').forEach(button=>button.addEventListener('click',()=>{
+  const select=$('#recognitionMode');
+  if(select.value===button.dataset.recognitionMode)return;
+  select.value=button.dataset.recognitionMode;
+  select.dispatchEvent(new Event('change',{bubbles:true}));
+}));
 $('#wordCaptureButton').addEventListener('click',async()=>{
   $('#wordCaptureButton').disabled=true;
   try{
@@ -712,6 +722,22 @@ function renderMessage(){
   document.dispatchEvent(new CustomEvent('handspeak:draft-changed'));
 }
 
+// Show the everyday words found in fingerspelled letters, as in the primary workspace.
+const letterWords=$('#letterWords'),letterWordsList=$('#letterWordsList'),letterWordsUse=$('#letterWordsUse');
+const knownLetterWords=new Set(COMMON_WORDS);
+let suggestedLetterWords='';
+function renderLetterWords(){
+  const result=wordsInMessage(message,knownLetterWords);
+  const show=result.found.length>0&&(result.split||(recognitionMode==='letters'&&signSet==='letters'));
+  letterWords.hidden=!show;
+  if(!show){suggestedLetterWords='';return;}
+  letterWordsList.replaceChildren(...result.found.map(word=>{const chip=document.createElement('b');chip.textContent=word;return chip;}));
+  suggestedLetterWords=result.text;
+  letterWordsUse.hidden=!result.split;
+}
+document.addEventListener('handspeak:draft-changed',renderLetterWords);
+letterWordsUse.addEventListener('click',()=>{if(suggestedLetterWords&&suggestedLetterWords!==message){message=suggestedLetterWords;renderMessage();}});
+
 function updateSentence(next){
   if(next===null){notify('Message limit reached (1000 characters)');return false;}
   message=next;renderMessage();return true;
@@ -733,7 +759,12 @@ function appendCharacter(char){
 
 function setRecognitionFeedback(text){
   const node=$('#recognitionFeedback');
-  if(node && node.textContent!==text)node.textContent=text;
+  if(!node)return;
+  const value=String(text||'');
+  const normalized=value.toLowerCase();
+  node.dataset.state=(/unavailable|failed|stopped|error|timed out|not supported|no camera/.test(normalized))?'error':
+    (/recognized| added\.|restored|ready/.test(normalized))?'success':'waiting';
+  if(node.textContent!==value)node.textContent=value;
 }
 // Calm display for static letters and digits. The big character does not follow every frame: it
 // shows a reading state until one candidate has lasted CANDIDATE_SHOW_MS, then the candidate with a

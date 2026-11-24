@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="#080909" name="theme-color"/>
+<meta content="#F0F5FA" name="theme-color"/>
 <meta content="HandSpeak Web translates selected ASL hand gestures into readable text." name="description"/>
 <title>HandSpeak Web</title>
 <link href="/favicon.svg" rel="icon" type="image/svg+xml"/>
@@ -17,6 +17,7 @@
 <link href="experience.css?v=20261117-removed-services-2" rel="stylesheet"/>
 <link href="letter-photos.css?v=20261117-full-reference-2" rel="stylesheet"/>
 <link href="recognition-pace.css?v=20261117-removed-services-2" rel="stylesheet"/>
+<link href="palette.css?v=20261124-8" rel="stylesheet"/>
 <style>#ai-studio,#history{display:none!important}</style>
 </head>
 <body>
@@ -44,7 +45,6 @@
 </section>
 <section aria-label="Sign recognition" class="workspace" id="workspace">
 <article class="camera-card">
-<details class="workspace-disclosure practice-disclosure"><summary>Practice a specific word</summary><div class="practice-picker"><label for="practiceWord">Choose a motion word</label><select id="practiceWord"><option value="">Select a word…</option></select><button class="secondary-button" id="preparePractice" type="button">Prepare practice</button><p id="practiceInstructions" role="status">Select a word to see its lesson and recording instructions. Recognition remains experimental.</p></div></details>
 <div class="card-heading">
 <div>
 <span class="step">01</span>
@@ -52,9 +52,14 @@
 </div>
 <span class="status-pill" id="cameraStatus"><i></i> Camera off</span>
 </div>
-<label class="mode-picker">Recognition mode
-          <select id="recognitionMode"><option value="letters">Letters · experimental J/Z motion</option><option value="numbers">Numbers · 0 to 9</option><option value="words">Words in motion · experimental</option></select>
-</label>
+<div class="mode-picker"><span>Recognition mode</span>
+<div aria-label="Recognition mode" class="mode-buttons" role="group">
+<button aria-pressed="true" data-recognition-mode="letters" type="button">Letters</button>
+<button aria-pressed="false" data-recognition-mode="numbers" type="button">Numbers</button>
+<button aria-pressed="false" data-recognition-mode="words" type="button">Words in motion</button>
+</div>
+<select aria-hidden="true" id="recognitionMode" tabindex="-1"><option value="letters">Letters &middot; experimental J/Z motion</option><option value="numbers">Numbers &middot; 0 to 9</option><option value="words">Words in motion &middot; experimental</option></select>
+</div>
 <div class="camera-stage" id="cameraStage">
 <video aria-label="Webcam preview" autoplay="" id="webcam" muted="" playsinline=""></video>
 <canvas aria-hidden="true" id="overlay"></canvas>
@@ -85,27 +90,16 @@
 </div>
 <p class="camera-tip"><span id="activeVocabulary">Camera vocabulary: Loading motion words…</span> · <a href="#vocabulary">Choose words</a>. Only words in the selected recognition preview are pretrained.</p>
 <label class="speech-option"><input checked="" id="automaticWords" type="checkbox"/> Automatic words · sign, then pause</label>
-<label class="speech-option" hidden="" id="wordOutputLabel">Show words as <select id="wordOutput"><option value="message">Message · words build one sentence</option><option value="word">Per word · one word at a time</option></select></label>
-<a class="example-camera-link" href="#sign-examples">Watch gesture examples →</a>
+<label hidden="" id="wordOutputLabel"><select aria-hidden="true" id="wordOutput" tabindex="-1"><option value="message"></option><option value="word"></option></select></label>
 <p class="camera-tip capture-detail" id="motionCaptureStatus" role="status">Select Words in motion and start the camera. Automatic words watches for movement; sign once, then pause briefly.</p>
 <details class="workspace-disclosure camera-settings"><summary>Camera settings &amp; diagnostics</summary><div class="face-controls"><label><input checked="" id="mirrorPreview" type="checkbox"/> Mirror preview</label><label class="camera-device-choice">Camera <select id="cameraDevice"><option value="">Browser default</option></select></label><label><input checked="" id="faceTrackingToggle" type="checkbox"/> Face tracking</label><span id="faceTrackingStatus" role="status">Camera off</span><span class="expression-readout">Expression: <b id="faceExpression" role="status">Camera off</b></span><button class="secondary-button" hidden="" id="faceRetry" type="button">Retry face tracking</button><small id="faceTrackingHelp">Visible facial movements · not a measure of emotion</small></div>
 <details class="camera-diagnostics"><summary>Camera diagnostics</summary><p>Local status only; no images or hand coordinates. Copy this report when a sign fails.</p><pre id="cameraDiagnostics">Start the camera to collect diagnostics.</pre><button class="secondary-button" id="copyCameraDiagnostics" type="button">Copy camera diagnostics</button></details>
 <p class="camera-tip" id="cameraHelp">Use a well-lit space and keep your palm facing the camera.</p></details>
 </article>
-<aside aria-label="Selected sign lesson" hidden="" id="cameraLesson"></aside>
-<div aria-label="Recognition workflow" class="workflow-strip">
-<a href="#workspace" id="pipelineTrack"><span class="workflow-number">01</span><span>Hand<br/>tracking</span><i aria-hidden="true" class="workflow-orb"></i></a>
-<a href="#motion-studio" id="pipelineMatch"><span class="workflow-number">02</span><span>Sign<br/>learning</span><i aria-hidden="true" class="workflow-grid"></i></a>
-<a href="#messageBox" id="pipelineReview"><span class="workflow-number">03</span><span>Message<br/>review</span><i aria-hidden="true" class="workflow-lines">≡</i></a>
-<button id="pipelineVoice" type="button"><span class="workflow-number">04</span><span>Voice<br/>output</span><i aria-hidden="true" class="workflow-wave"><svg stroke="currentColor" stroke-width="2" viewbox="0 0 28 24"><path d="M2 10v4m5-8v12m5-16v20m5-14v8m5-12v16m4-10v4"></path></svg></i></button>
-</div>
-</section>
-<section class="data-section" id="history" hidden inert>
 <article aria-label="Message editor and speech" class="saved-message-editor">
 <div class="card-heading">
 <div>
-<span class="step coral">02</span>
-<h2>Your words <small>/ ready to review</small></h2>
+<h2>Message</h2>
 </div>
 <div class="draft-actions"><button class="text-button" disabled="" id="undoButton" type="button">Undo</button><button class="text-button" id="clearButton" type="button">Clear all</button></div>
 </div>
@@ -118,6 +112,7 @@
 <button aria-label="Delete last word" id="deleteWordButton" title="Delete last word" type="button">⌫ word</button>
 </div>
 </div>
+<div aria-live="polite" class="letter-words" id="letterWords" role="status" hidden><span class="letter-words-label">Words in your letters</span><span class="letter-words-list" id="letterWordsList"></span><button class="text-button" id="letterWordsUse" type="button" hidden>Use these words</button></div>
 <details class="workspace-disclosure accessibility-controls"><summary>Reading &amp; speech settings</summary><label>Text size<select id="textSize"><option value="normal">Normal</option><option value="large">Large</option></select></label><label>Speech speed<select id="speechRate"><option value="0.8">Slower</option><option value="1">Normal</option><option value="1.2">Faster</option></select></label><p>Keyboard shortcuts: Alt + Shift + S to speak, E to edit, X to stop. Shortcuts pause while typing.</p></details><section aria-labelledby="sentenceToolsTitle" class="sentence-tools">
 <h3 id="sentenceToolsTitle">Build a sentence</h3>
 <p class="camera-tip">Sign one word, then pause. Add the match to your draft, or turn on automatic adding below. Review the draft before speaking.</p>
@@ -151,7 +146,17 @@
 <div><span aria-hidden="true" class="info-icon">✓</span><p><b>Hold each sign steady</b><small>Letters are added after a stable detection.</small></p></div>
 <div><span aria-hidden="true" class="info-icon coral-bg">↻</span><p><b>Move between signs</b><small>Lower your hand briefly before repeating a letter.</small></p></div>
 </div>
-</article><div class="section-title">
+</article>
+<aside aria-label="Selected sign lesson" hidden="" id="cameraLesson"></aside>
+<div aria-label="Recognition workflow" class="workflow-strip">
+<a href="#workspace" id="pipelineTrack"><span class="workflow-number">01</span><span>Hand<br/>tracking</span><i aria-hidden="true" class="workflow-orb"></i></a>
+<a href="#motion-studio" id="pipelineMatch"><span class="workflow-number">02</span><span>Sign<br/>learning</span><i aria-hidden="true" class="workflow-grid"></i></a>
+<a href="#messageBox" id="pipelineReview"><span class="workflow-number">03</span><span>Message<br/>review</span><i aria-hidden="true" class="workflow-lines">≡</i></a>
+<button id="pipelineVoice" type="button"><span class="workflow-number">04</span><span>Voice<br/>output</span><i aria-hidden="true" class="workflow-wave"><svg stroke="currentColor" stroke-width="2" viewbox="0 0 28 24"><path d="M2 10v4m5-8v12m5-16v20m5-14v8m5-12v16m4-10v4"></path></svg></i></button>
+</div>
+</section>
+<section class="data-section" id="history" hidden inert>
+<div class="section-title">
 <div><span class="eyebrow"><span></span> Saved translations</span><h2>Communication history</h2></div>
 <div class="section-actions"><button class="secondary-button" id="refreshHistory" type="button">Refresh</button><a class="primary-link" href="/api/export/sessions.csv">Export CSV</a></div>
 </div>
