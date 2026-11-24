@@ -392,7 +392,8 @@ export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic
     return true;
   }
   function dismissChoices(){if(choices.length){offer([]);setHelp('No word was added. Sign again when you are ready.');}}
-  function maybeAddToSentence(){if($('#sentenceAutoAdd').checked)acceptPending(true);}
+  // The visible Automatic words option should both capture and add a reliable motion match.
+  function maybeAddToSentence(){if($('#automaticWords').checked||$('#sentenceAutoAdd').checked)acceptPending(true);}
   $('#motionTeach').addEventListener('click',()=>start(true));
   $('#motionRecognize').addEventListener('click',()=>start(false));
   $('#motionCancel').addEventListener('click',cancel);

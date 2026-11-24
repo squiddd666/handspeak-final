@@ -87,7 +87,7 @@
 <button class="secondary-button" id="demoButton" type="button">Try demo</button>
 </div>
 <p class="camera-tip"><span id="activeVocabulary">Camera vocabulary: Loading motion words…</span> · <a href="#vocabulary">Choose words</a>. Only words in the selected recognition preview are pretrained.</p>
-<label class="speech-option"><input checked="" id="automaticWords" type="checkbox"/> Automatic words · sign, then pause</label>
+<input checked="" hidden="" id="automaticWords" type="checkbox"/>
 <label hidden="" id="wordOutputLabel"><select aria-hidden="true" id="wordOutput" tabindex="-1"><option value="message"></option><option value="word"></option></select></label>
 <p class="camera-tip capture-detail" id="motionCaptureStatus" role="status">Select Words in motion and start the camera. Automatic words watches for movement; sign once, then pause briefly.</p>
 <details class="workspace-disclosure camera-settings"><summary>Camera settings &amp; diagnostics</summary><div class="face-controls"><label><input checked="" id="mirrorPreview" type="checkbox"/> Mirror preview</label><label class="camera-device-choice">Camera <select id="cameraDevice"><option value="">Browser default</option></select></label><label><input checked="" id="faceTrackingToggle" type="checkbox"/> Face tracking</label><span id="faceTrackingStatus" role="status">Camera off</span><span class="expression-readout">Expression: <b id="faceExpression" role="status">Camera off</b></span><button class="secondary-button" hidden="" id="faceRetry" type="button">Retry face tracking</button><small id="faceTrackingHelp">Visible facial movements · not a measure of emotion</small></div>
@@ -114,7 +114,7 @@
 <details class="workspace-disclosure accessibility-controls"><summary>Reading &amp; speech settings</summary><label>Text size<select id="textSize"><option value="normal">Normal</option><option value="large">Large</option></select></label><label>Speech speed<select id="speechRate"><option value="0.8">Slower</option><option value="1">Normal</option><option value="1.2">Faster</option></select></label><p>Keyboard shortcuts: Alt + Shift + S to speak, E to edit, X to stop. Shortcuts pause while typing.</p></details><section aria-labelledby="sentenceToolsTitle" class="sentence-tools">
 <h3 id="sentenceToolsTitle">Build a sentence</h3>
 <p class="camera-tip">Sign one word, then pause. Add the match to your draft, or turn on automatic adding below. Review the draft before speaking.</p>
-<label class="speech-option"><input id="sentenceAutoAdd" type="checkbox"/> Automatically add motion matches to my draft</label>
+<label class="speech-option"><input checked="" id="sentenceAutoAdd" type="checkbox"/> Automatically add motion matches to my draft</label>
 <p class="camera-tip">Automatic adding can include incorrect words. Review your draft before selecting Speak message.</p>
 <details class="workspace-disclosure"><summary>Typed words &amp; sentence tools</summary><div aria-label="Add a typed word" class="sentence-word-buttons" role="group">
 <span>Typed words:</span>
@@ -305,6 +305,6 @@
 <script src="guided-experience.js?v=20261123-no-home-navigation" type="module"></script>
 <script src="guest-session.js?v=20261117-removed-services-2" type="module"></script>
 <script src="sign-examples.js?v=20261123-reference-words-six-only-1" type="module"></script>
-<script src="app.js?v=20261124-white-theme" type="module"></script>
+<script src="app.js?v=20261124-motion-auto-add" type="module"></script>
 </body>
 </html>
