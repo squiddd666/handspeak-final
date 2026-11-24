@@ -26,7 +26,7 @@ export function createExperienceUI({getMessage,setMessage,stopSpeech}){
    wrap.append(label,remove);chips.append(wrap);
   });
   if(!words.length){const empty=el('span','Your sentence starts with the first added word.');empty.className='chips-empty';chips.append(empty);}
-  progress.textContent=words.length?`${words.length} words collected · Review them, then choose Speak message.`:'Collecting words · Sign once, then pause.';
+  progress.textContent=words.length?`${words.length} words collected · Review them, then sign FINISH.`:'Collecting words · Sign once, then pause.';
   // Never silently overwrite a correction dialog after the draft changes.
   if($('#wordCorrectionDialog').open){$('#wordCorrectionDialog').close();editIndex=-1;}
  }

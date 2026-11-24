@@ -23,20 +23,11 @@ window.addEventListener('hashchange',()=>show(location.hash||'#workspace',false)
 $('#startSigning').addEventListener('click',()=>show('#workspace'));
 $('#startFocusedDemo')?.addEventListener('click',()=>{const mode=$('#recognitionMode');mode.value='words';mode.dispatchEvent(new Event('change'));show('#workspace');});
 function dock(){show('#workspace');$('#cameraLesson').hidden=false;$('#cameraLesson').append(lesson);}
-function selectLesson(id){const button=words.find(b=>b.dataset.signExample===id);if(button){button.click();$('#practiceWord').value=id;$('#practiceInstructions').textContent=$('#signExampleMode').textContent;}}
+function selectLesson(id){const button=words.find(b=>b.dataset.signExample===id);if(button)button.click();}
 document.addEventListener('handspeak:default-practice',e=>{selectLesson(e.detail.label.toLowerCase().replaceAll(' ','-'));dock();});
 document.addEventListener('handspeak:practice',e=>{selectLesson(e.detail.id);dock();});
 document.addEventListener('handspeak:enable-word-preview',e=>{if(e.detail?.id){selectLesson(e.detail.id);dock();}else show('#workspace');});
 const words=[...document.querySelectorAll('[data-sign-example]')];
-for(const b of words)$('#practiceWord').add(new Option(b.textContent,b.dataset.signExample));
-$('#preparePractice').addEventListener('click',()=>{
- const id=$('#practiceWord').value,button=words.find(b=>b.dataset.signExample===id);
- if(!button){$('#practiceInstructions').textContent='Choose a word first.';return;}
- button.click();dock();
- const daily=['name','home','have','want','love'].includes(id);
- if(daily){const mode=$('#recognitionMode');mode.value='words';mode.dispatchEvent(new Event('change'));$('#practiceInstructions').textContent='Automatic server capture · Enable five-word server processing below and Automatic words. Start the camera, sign once, then pause. Review each result. Manual recording is also available.';}
- else{$('#signExamplePractice').click();$('#practiceInstructions').textContent='Automatic capture · Start the camera, sign once, then pause. Review the suggested word. If capture misses your movement, use Record a word.';}
-});
 const initialTarget=location.hash||'#workspace';
 if(!location.hash)history.replaceState(null,'','#workspace');
 show(initialTarget,false);

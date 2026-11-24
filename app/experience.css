@@ -40,6 +40,7 @@ section[id],div[id]{scroll-margin-top:24px}
 .camera-card>.camera-actions button{font-size:13px;min-height:44px}
 .camera-card>.camera-tip{padding:4px 22px 14px;font:13px/1.6 'DM Sans',sans-serif;color:#aeb8ae}
 .camera-card>.speech-option,.camera-card>.example-camera-link{padding:8px 22px;font-size:13px}
+#wordOutputLabel{display:none!important}
 .camera-card>.capture-detail{display:none}
 .camera-stage .capture-telemetry,.camera-stage .capture-transcript,.camera-stage .capture-bottomline,.camera-stage .frame-guide{display:none}
 .camera-stage .capture-topline{opacity:.65}
@@ -108,3 +109,41 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,te
 .ten-words{margin:14px 20px 4px;color:#d8e8c8}.more-word-models{margin:12px 0 0}
 
 .saved-message-editor{padding:24px;margin:20px 0;background:#111410;border:1px solid #344030;border-radius:10px;display:grid;gap:16px;min-width:0}.site-header nav{flex-wrap:wrap}.saved-message-editor .output-actions{flex-wrap:wrap}.word-controls>summary{cursor:pointer;padding:16px;font-weight:700}@media(max-width:650px){.saved-message-editor{padding:16px}.site-header nav{justify-content:center}}
+
+/* Workspace message panel */
+.workspace>.saved-message-editor{margin:0;align-self:stretch;width:100%}
+.workspace>.saved-message-editor .accessibility-controls,
+.workspace>.saved-message-editor .sentence-tools,
+.workspace>.saved-message-editor #deleteWordButton,
+.workspace>.saved-message-editor #copyButton,
+.workspace>.saved-message-editor #saveButton,
+.workspace>.saved-message-editor>.camera-tip,
+.workspace>.saved-message-editor .recognition-info{display:none!important}
+.workspace>.saved-message-editor .sentence-progress{padding:0;background:transparent;color:#dcefc5}
+.workspace>.saved-message-editor .sentence-chips{min-height:20px}
+.workspace>.saved-message-editor .message-box{min-height:500px}
+.workspace>.saved-message-editor .output-actions{display:grid;grid-template-columns:1fr 1fr;width:100%}
+.workspace>.saved-message-editor #speakButton{grid-column:1/-1;width:100%}
+.workspace>.saved-message-editor #stopSpeechButton,
+.workspace>.saved-message-editor #editMessageButton{width:100%;min-width:0}
+@media(max-width:800px){.workspace>.saved-message-editor .message-box{min-height:360px}}
+
+/* Keep recognition and its message draft visible together on desktop. */
+@media(min-width:901px){
+ .workspace{display:grid;grid-template-columns:minmax(0,2fr) minmax(340px,1fr);align-items:stretch;gap:16px}
+ .workspace>.camera-card{grid-column:1;grid-row:1;min-width:0}
+ .workspace>.saved-message-editor{grid-column:2;grid-row:1;height:100%;min-width:0;grid-template-rows:auto auto auto minmax(430px,1fr) auto auto}
+ .workspace>.saved-message-editor .message-box{min-height:430px}
+ .workspace>#cameraLesson:not([hidden]){grid-column:1/-1;grid-row:2}
+ .workspace>.workflow-strip{grid-column:1/-1}
+}
+
+/* These secondary capture/demo controls are intentionally omitted from the workspace. */
+#wordCaptureButton,#demoButton,.camera-card>.camera-tip:has(#activeVocabulary){display:none!important}
+
+.letter-words{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0;padding:10px 12px;border:1px solid #2a302b;border-radius:10px;background:#0d100e}
+.letter-words[hidden],.letter-words [hidden]{display:none!important}
+.letter-words-label{flex:1 1 100%;color:#8f998f;font:600 11px/1.3 'DM Sans',sans-serif;letter-spacing:.07em;text-transform:uppercase}
+.letter-words-list{display:flex;flex:1 1 0;flex-wrap:wrap;gap:6px;min-width:0}
+.letter-words-list b{padding:4px 11px;border:1px solid #3d4a31;border-radius:14px;background:#1a2216;color:#e4efdc;font:600 13.5px/1.35 'DM Sans',sans-serif}
+.letter-words #letterWordsUse{flex:none;min-height:32px;padding:0 12px;border:1px solid #4a5d3a;border-radius:8px;color:#d5e6b9;font-size:13px;font-weight:600}
