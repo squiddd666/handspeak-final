@@ -1197,9 +1197,6 @@ $('#undoButton').addEventListener('click',()=>{
 });
 $('#copyButton').addEventListener('click',async()=>{if(!message)return notify('There is no message to copy');try{await navigator.clipboard.writeText(message);notify('Message copied')}catch{notify('Copy is unavailable in this browser')}});
 $('#speakButton').addEventListener('click',()=>{if(!message)return notify('Add a message first');speakText(message)});
-$('#contrastButton').addEventListener('click',()=>{const enabled=document.body.classList.toggle('high-contrast');$('#contrastButton').setAttribute('aria-pressed',String(enabled));try{localStorage.setItem('handspeak-contrast',enabled)}catch{}});
-try{if(localStorage.getItem('handspeak-contrast')==='true'){document.body.classList.add('high-contrast');$('#contrastButton').setAttribute('aria-pressed','true');}}catch{}
-
 $('#demoButton').addEventListener('click',()=>{
   if(running) stopCamera();
   clearInterval(demoTimer);
