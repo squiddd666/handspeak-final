@@ -1,11 +1,11 @@
 const $=s=>document.querySelector(s);
-const views={workspace:['workspace'],learn:['learn','motion-studio'],'ai-studio':['ai-studio'],history:['history'],evaluate:['evaluate'],about:['about']};
+const views={workspace:['workspace'],learn:['learn','motion-studio'],'teach-a-sign':['teach-a-sign'],history:['history'],evaluate:['evaluate'],about:['about']};
 const lesson=$('#sign-examples'),lessonHome=document.createComment('Lesson position');lesson.before(lessonHome);
 let current='';
 function show(target,update=true){
  if(target==='#home'){target='#workspace';history.replaceState(null,'',target);}
  const requested=document.getElementById(target.replace(/^#/,''));
- if(['#ai-studio','#history'].includes(target)||(requested&&[$('#ai-studio'),$('#history')].some(section=>section.contains(requested)))){target='#workspace';history.replaceState(null,'',target);}
+ if(['#history'].includes(target)||(requested&&[$('#history')].some(section=>section.contains(requested)))){target='#workspace';history.replaceState(null,'',target);}
  const node=document.getElementById(target.replace(/^#/,''));
  let view=Object.keys(views).find(v=>views[v].some(id=>document.getElementById(id)?.contains(node)))||'workspace';
  if(target==='#sign-examples')view='learn';

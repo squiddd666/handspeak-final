@@ -22,9 +22,9 @@ import {validWordNetwork,recognizeWordNetwork,wordNetworkShares} from './word-ne
 // GO) and the single-word BABY detector stay loaded, so that their signs are still told apart from
 // these ten, but a match to one of them is not suggested. A word the user taught is always offered,
 // and so is every word of a vocabulary chosen in the library. To change the ten, edit this list.
-export const OFFERED_WORDS=Object.freeze(['HELLO','THANK YOU','PLEASE','YES','NO','FINISH','DRINK','WATER','FOOD','HUNGRY']);
+export const OFFERED_WORDS=Object.freeze(['HELLO','PLEASE','FINISH','WATER','FOOD','HUNGRY']);
 const OFFERED=new Set(OFFERED_WORDS);
-const EXTRA_WORDS=['DRINK','WATER','BOOK','FOOD','HUNGRY','LIKE','GO'];
+const EXTRA_WORDS=['WATER','FOOD','HUNGRY'];
 const OFFERED_EXTRA=EXTRA_WORDS.filter(word=>OFFERED.has(word));
 
 export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic=()=>{},automaticCooldownMs=800,revealDelayMs=0,onPace=()=>{},onChoices=()=>{},speakAdded=()=>false,retryEmptyCapture=false,teachWithAutomaticCapture=false}){
@@ -52,8 +52,7 @@ export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic
   // answers for its own words and has a "none of these" answer of its own. The matcher below is still
   // asked, but only a word the network does not have (a personal word) is taken from it, and the
   // single-word detectors are not heard for the network's words. Without the flag none of this runs.
-  const NETWORK_FILES={network:'asl-words-network-candidate.json','network-open':'asl-words-network-open-candidate.json'};
-  const wantWordNetwork=typeof URLSearchParams!=='undefined'&&typeof location!=='undefined'?NETWORK_FILES[new URLSearchParams(location.search).get('wordModel')]||null:null;
+  const wantWordNetwork=null;
   // A word is offered as a choice when the network gives it at least this share of its answer.
   const NETWORK_CHOICE_SHARE=.12;
   let wordNetwork=null;
@@ -111,6 +110,32 @@ export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic
     return Object.entries(best).filter(([label,d])=>d<=cutoff(label)*CHOICE_REACH).sort((a,b)=>a[1]-b[1]).slice(0,3).map(([label])=>label);
   };
   const offer=list=>{if(!list.length&&!choices.length)return;choices=list;onChoices(list.slice());};
+  let sharedSnapshot=[],sharedQueue=Promise.resolve();
+  const sampleKey=row=>JSON.stringify(row);
+  async function wordRequest(body){const r=await fetch('/api/shared-words',body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{});if(!r.ok)throw Error('Shared word storage unavailable');return (await r.json()).samples;}
+  // Changes are additive across users; no whole-library overwrites.
+  function syncShared(){
+    const local=examples.slice(),before=sharedSnapshot.slice();
+    sharedSnapshot=local;
+    sharedQueue=sharedQueue.then(async()=>{
+      const add=local.filter(r=>!before.some(b=>sampleKey(b)===sampleKey(r)));
+      const removed=before.filter(r=>!local.some(b=>sampleKey(b)===sampleKey(r)));
+      // Removal is by label through a fresh server read; preserve other words.
+      const current=await wordRequest();
+      const labels=new Set(removed.map(r=>r.label));
+      const remove=[];
+      for(const row of current.filter(r=>labels.has(r.label))){
+        // Backend hashes canonical sorted JSON; request explicit labels below instead.
+      }
+      const result=await wordRequest({add,removeLabels:[...labels]});
+      examples=result.filter(r=>labelOK(r.label)&&validMotion(r.sequence));sharedSnapshot=examples.slice();
+      localStorage.setItem(key,JSON.stringify(examples));render();
+    }).catch(()=>{sharedSnapshot=before;setHelp('Saved in this browser, but server sync failed. Reload to retry.');});
+  }
+  async function loadShared(){
+    try{const local=examples.slice();const remote=await wordRequest();sharedSnapshot=remote.slice();examples=remote.concat(local.filter(r=>!remote.some(b=>sampleKey(b)===sampleKey(r))));localStorage.setItem(key,JSON.stringify(examples));if(examples.length!==remote.length)syncShared();render();}catch{setHelp('Shared words unavailable; using browser samples.');}
+  }
+  setTimeout(loadShared,0);
   // Tells a guided recording step how a personal-example recording ended.
   const taught=(label,saved,reason='')=>{if(label)document.dispatchEvent?.(new CustomEvent('handspeak:word-example',{detail:{label,saved,reason,count:examples.filter(e=>e.label===label).length}}));};
   const recognizeRaw=(sequence,frames,aspect)=>{if(isTemporalWordModel(categoryModel))return recognizeTemporalWord(categoryModel,frames,aspect);if(!categoryModel){const existing=defaultMatch(sequence);if(existing)return existing;for(const model of binaryModels){const match=recognizeBinaryTemporal(model,frames,aspect);if(match&&!networkHas(match.label))return match;}return null;}const match=recognizeMotion(sequence,allExamples(),parameters);return match&&match.label!=='OTHER MOVEMENT'?match:null;};
@@ -124,11 +149,11 @@ export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic
     const legacy=JSON.parse(localStorage.getItem('handspeak-motion-v2')||localStorage.getItem('handspeak-motion-v1')||'[]');
     legacyExamples=Array.isArray(legacy)&&legacy.length>0;
   }catch{}
+  let wordBundlePromise;
+  function loadWordBundle(){return wordBundlePromise??=fetch('./models/word-model.json?v=20261126-six-only').then(r=>{if(!r.ok)throw Error('Word model unavailable');return r.json();}).then(data=>{if(data.format!=='handspeak-word-bundle-v1'||!data.models)throw Error('Invalid word bundle');return data.models;});}
   async function loadPretrained(){
     try{
-      const response=await fetch('./models/asl-words.json?v=20261020-camera-compatibility-2');
-      if(!response.ok)throw new Error('Word model download failed');
-      const model=await response.json();
+      const model=(await loadWordBundle()).default;
       if(model.version!==1||model.encoding!=='two-hand-motion-v3'||!validMotionParameters(model.parameters)
         ||!Array.isArray(model.samples)||model.samples.length<6||model.samples.length>600
         ||!model.samples.every(e=>labelOK(e.label)&&validMotion(e.sequence)))throw new Error('Invalid word model');
@@ -140,8 +165,7 @@ export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic
       if(!wantWordGate){if(!categoryModel)baseState+=' · earlier matching rule (comparison)';}
       if(wantWordGate){
         try{
-          const reply=await fetch('./models/asl-words-gate.json?v=20261113-gate-2');
-          const gate=reply.ok?await reply.json():null;
+          const gate=(await loadWordBundle()).gate;
           if(gate&&gate.version===1&&gate.appliesTo==='models/asl-words.json'&&validMotionParameters(gate.parameters)
             &&Array.isArray(gate.negatives)&&gate.negatives.length<=200&&gate.negatives.every(entry=>validMotion(entry.sequence))
             &&(gate.negativeMargin===0||(Number.isFinite(gate.negativeMargin)&&gate.negativeMargin>=1&&gate.negativeMargin<=3))){
@@ -162,20 +186,11 @@ export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic
   }
   async function loadExpansion(){
     try {
-      const response=await fetch('./models/asl-extra-words.json?v=20261023-hungry-cutoff-1');
-      if(!response.ok)throw new Error('Extra words unavailable');
-      const model=await response.json();
+      const model=(await loadWordBundle()).expanded;
       if(model.version!==1||model.encoding!=='two-hand-motion-v3'||!validMotionParameters(model.parameters)
-        ||!Array.isArray(model.labels)||model.labels.length!==7||new Set(model.labels).size!==7||!model.labels.every(l=>['DRINK','WATER','BOOK','FOOD','HUNGRY','LIKE','GO'].includes(l))
+        ||!Array.isArray(model.labels)||model.labels.length!==3||new Set(model.labels).size!==3||!model.labels.every(l=>['WATER','FOOD','HUNGRY'].includes(l))
         ||!Array.isArray(model.samples)||model.samples.length>200||!model.samples.every(e=>model.labels.includes(e.label)&&validMotion(e.sequence))
         ||!model.labels.every(l=>model.samples.filter(e=>e.label===l).length>=3))throw new Error('Invalid extra word model');
-      const prior=model.baselineExtra;
-      if(!prior || !validMotionParameters(prior.parameters) || !Array.isArray(prior.labels)
-        || prior.labels.length!==3 || new Set(prior.labels).size!==3 || !prior.labels.every(l=>['DRINK','WATER','BOOK'].includes(l))
-        || !Array.isArray(prior.samples) || prior.samples.length>200 || !prior.samples.every(e=>prior.labels.includes(e.label)&&validMotion(e.sequence))
-        || !prior.labels.every(l=>prior.samples.filter(e=>e.label===l).length>=3)
-        || !Array.isArray(model.newLabels) || model.newLabels.length!==4 || new Set(model.newLabels).size!==4
-        || !model.newLabels.every(l=>['FOOD','HUNGRY','LIKE','GO'].includes(l)))throw new Error('Invalid preview stages');
       expansion=model;
       $('#expandedWords').disabled=false;
       let wanted=null;try{wanted=localStorage.getItem('handspeak-extra-words');}catch{}
@@ -188,12 +203,8 @@ export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic
   }
   async function loadBinaryModels(){
     const loaded=[];
-    for(const [path,word] of [
-      ['./models/hello-binary.json?v=20261021-binary-2','HELLO'],
-      ['./models/baby-binary.json?v=20261021-baby-1','BABY'],
-      ['./models/water-binary.json?v=20261021-water-1','WATER']
-    ])try{
-      const response=await fetch(path);
+    for(const [profile,word] of [['hello','HELLO'],['water','WATER']])try{
+      const response={ok:true,json:async()=>(await loadWordBundle())[profile]};
       if(!response.ok)throw new Error(`${word} model download failed`);
       const model=await response.json();
       if(!validBinaryTemporalModel(model)||model.word!==word)throw new Error(`Invalid ${word} model`);
@@ -248,7 +259,7 @@ export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic
     if(!sequence){onStatus('Hands not tracked',`Your hands were not clearly visible for the whole sign (${tracked} of ${active.frames.length} frames). Keep them inside the picture.`);setHelp(`Not enough clear hand tracking: hands visible in ${tracked}/${active.frames.length} frames. Keep your hands fully in view and use front lighting.`);taught(active.label,false,'tracking');return;}
     if(active.label){
       const updated=examples.concat({label:active.label,sequence});
-      try{localStorage.setItem(key,JSON.stringify(updated));examples=updated;
+      try{localStorage.setItem(key,JSON.stringify(updated));examples=updated;syncShared();
         setHelp(`Saved an example of “${active.label}”. Record it again with a slightly different speed.`);onStatus('—','Personal example saved — record another example or try recognition.');
         taught(active.label,true);
       }catch{setHelp('Could not save this recording. Browser storage may be full.');taught(active.label,false,'storage');}
@@ -258,7 +269,7 @@ export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic
       onDiagnostic({capture:'manual',frames:active.frames.length,trackedFrames:tracked,validSequence:true,match:pending?.label||null,sequence});
       const near=pending?[]:nearestWords(sequence);
       setHelp(pending?`Possible match: “${pending.label}”. Check it before adding it to your message.`:`Captured ${active.frames.length} frames, but the model found no clear match. This experimental model may not recognize your signing reliably.`);
-      onStatus(pending?.label||'No reliable match',pending?'Possible match — verify before adding':near.length?'Close to a word, but not close enough to be sure. Choose below if one of them is right.':'This did not look like any of the words in use. Your sign may still be correct.');
+      onStatus(pending?.label||'No reliable match',pending?'Possible match — verify before adding':near.length?'Close to a word, but not close enough to be sure. Choose below if one of them is right.':'This did not look like any of the words in use. Your sign may still be correct.',pending);
       offer(near);
       maybeAddToSentence();
     }
@@ -306,7 +317,7 @@ export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic
   function endTeach(){teachAuto=null;$('#motionTeach').disabled=false;$('#motionRecognize').disabled=false;$('#motionLabel').disabled=false;$('#motionCancel').disabled=true;$('#wordCaptureButton').disabled=false;}
   function saveTaught(label,sequence){
     const updated=examples.concat({label,sequence});
-    try{localStorage.setItem(key,JSON.stringify(updated));examples=updated;
+    try{localStorage.setItem(key,JSON.stringify(updated));examples=updated;syncShared();
       setHelp(`Saved an example of “${label}”. Record it again with a slightly different speed.`);onStatus('—','Personal example saved — record another example or try recognition.');
       taught(label,true);
     }catch{setHelp('Could not save this recording. Browser storage may be full.');taught(label,false,'storage');}
@@ -367,7 +378,7 @@ export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic
       :!sequence?`Your hands were not clearly visible for the whole sign (${tracked} of ${clip.frames.length} frames). Keep them inside the picture.`
       :near.length?'Close to a word, but not close enough to be sure. Choose below if one of them is right.'
       :'This did not look like any of the words in use. Your sign may still be correct.';
-    onStatus(pending?.label||(clip.frames.length<12?'Not enough frames':!sequence?'Capture incomplete':'No reliable match'),reason);
+    onStatus(pending?.label||(clip.frames.length<12?'Not enough frames':!sequence?'Capture incomplete':'No reliable match'),reason,pending);
     offer(near);
     onPace('result');
     setHelp(pending?`Possible match: “${pending.label}”. Pause before your next sign. Review it before adding it.`:detail);
@@ -404,7 +415,7 @@ export function createMotionStudio({isRunning,onWord,onStatus,speak,onDiagnostic
     const label=$('#motionLabel').value.trim().replace(/\s+/g,' ').toUpperCase();
     const updated=examples.filter(e=>e.label!==label);
     if(updated.length===examples.length){setHelp('Enter the name of a recorded word to remove it.');return;}
-    try{localStorage.setItem(key,JSON.stringify(updated));examples=updated;pending=null;render();setHelp(`Removed “${label}”.`);}
+    try{localStorage.setItem(key,JSON.stringify(updated));examples=updated;syncShared();pending=null;render();setHelp(`Removed “${label}”.`);}
     catch{setHelp('Could not update browser storage.');}
   });
   render();

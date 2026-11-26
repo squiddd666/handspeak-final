@@ -44,16 +44,18 @@ class ResearchWords:
   if override:return override
   # Fall back to the bundled location so deploying the artifact is a file drop,
   # not an environment change. The hash pin below still has to match.
-  default=Path(__file__).resolve().parent/'models/research-words.json'
+  default=Path(__file__).resolve().parent/'models/word-model.json'
   return str(default) if default.is_file() else ''
- def status(self):return {'available':bool(self.path() and Path(self.path()).is_file()),'labels':LABELS,'experimental':True,'test':{'correct':12,'total':24,'unsupportedFalse':0,'unsupportedTotal':0},'processing':'server-landmarks','retention':'not stored','manualOnly':True}
+ def status(self):return {'available':False,'labels':[],'experimental':True}
  def predict(self,seq):
+  raise ResearchError("Research vocabulary removed; only six pretrained words are enabled.",404)
   if not valid_sequence(seq):raise ResearchError('Expected 20 frames of valid hand-landmark features.')
   if not self.lock.acquire(blocking=False):raise ResearchError('The five-word recognizer is busy. Try again shortly.',429)
   try:
    if self.model is None:
     try:
      path=Path(self.path());raw=path.read_bytes()
+     if path.name=='word-model.json': raw=json.loads(raw)['researchRaw'].encode('utf-8')
      if hashlib.sha256(raw).hexdigest()!=EXPECTED_SHA:raise ValueError('Model hash mismatch')
      model=json.loads(raw)
      compatibility=model.get('cameraCompatibility',{})

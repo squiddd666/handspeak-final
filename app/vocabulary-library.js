@@ -25,14 +25,8 @@ export function createVocabularyLibrary({onWord,setVocabulary,isOffered=()=>true
     await practice(item);
   });
   function renderCameraAccuracy(){
-    const output=$('#liveWordAccuracy');if(!output)return;
-    output.hidden=!cameraMatch;if(!cameraMatch)return;
-    const {label,daily,personal}=cameraMatch;
-    const pack=packs.find(pack=>pack.id===active);
-    const profile=accuracyProfiles[daily?'daily':$('#expandedWords').checked&&!$('#expandedWords').disabled?'expanded':'default'];
-    const metrics=personal?null:!daily&&pack?publishedAccuracy(pack,label):profile?.words?.[label];
-    output.textContent=accuracyText(metrics)+(metrics&&profile?.model&&!pack&&!personal?` · ${profile.model}`:'');
-    output.title='Accuracy on recorded test clips, not confidence in this camera match. Live-camera accuracy is unverified.';
+    const output=$('#liveWordAccuracy');
+    if(output){output.hidden=true;output.textContent='';}
   }
   function renderMotionAccuracy(){
     const summary=$('#motionAccuracySummary'),body=$('#motionWordAccuracy');if(!summary||!body)return;

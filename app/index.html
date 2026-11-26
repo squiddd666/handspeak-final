@@ -17,8 +17,10 @@
 <link href="experience.css?v=20261117-removed-services-2" rel="stylesheet"/>
 <link href="letter-photos.css?v=20261117-full-reference-2" rel="stylesheet"/>
 <link href="recognition-pace.css?v=20261117-removed-services-2" rel="stylesheet"/>
-<link href="palette.css?v=20261124-13" rel="stylesheet"/>
-<style>#ai-studio,#history{display:none!important}</style>
+<link href="palette.css?v=20261126-upload-1" rel="stylesheet"/>
+<style>#history,#evaluate,#saveButton{display:none!important}</style>
+<link rel="stylesheet" href="teach-a-sign.css?v=4"/>
+<style>#liveResult > span:first-child:not([id]), #liveResult #liveConfidence {display:none!important}</style>
 </head>
 <body>
 <a class="skip-link" href="#workspace">Skip to sign recognition</a>
@@ -29,6 +31,7 @@
 <nav aria-label="Main navigation">
 <a class="active" href="#workspace">Sign Recognition</a>
 <a href="#learn">Learn</a>
+<a href="#teach-a-sign">Teach A Sign</a>
 </nav>
 </header>
 <main id="main">
@@ -72,7 +75,7 @@
 <div class="capture-bottomline"><span>CAM_01 <i>●</i> <span id="captureFeed">OFFLINE</span></span><span>LOCAL VISION / PRIVATE BY DESIGN</span></div>
 <div aria-hidden="true" class="frame-guide"><i></i><i></i><i></i><i></i></div>
 <div class="live-result" hidden="" id="liveResult">
-<span>Camera match · verify before speaking</span>
+
 <strong id="liveLetter">—</strong>
 <small id="liveConfidence">No match yet</small>
 <span aria-label="Recognition progress" aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="live-progress" id="liveProgress" role="progressbar"><i></i></span>
@@ -246,7 +249,7 @@
 <p class="camera-tip">External lessons open their publisher’s website. ASL signs and phrase grammar vary by context; English phrases are not automatically a single sign. Typed text buttons do not count as camera recognition.</p>
 </section>
 </section>
-<section class="ai-section" id="ai-studio" hidden inert>
+<section class="ai-section" id="teach-a-sign" hidden>
 <div class="ai-copy">
 <span class="eyebrow light"><span></span> Personalized machine learning</span>
 <h2>Recognize letters, then personalize your signing.</h2>
@@ -302,9 +305,9 @@
 <dialog aria-labelledby="wordCorrectionTitle" class="feature-dialog" id="wordCorrectionDialog"><h2 id="wordCorrectionTitle">Correct this word</h2><form id="wordCorrectionForm"><label>Replacement<input id="wordCorrection" maxlength="80" required=""/></label><p id="wordCorrectionError" role="alert"></p><button class="primary-button" type="submit">Replace word</button></form><button class="secondary-button" id="removeChip" type="button">Remove word</button><button class="text-button" id="closeWordCorrection" type="button">Cancel</button></dialog><dialog aria-describedby="tutorialText" aria-labelledby="tutorialTitle" class="feature-dialog" id="tutorialDialog"><span id="tutorialCounter"></span><h2 id="tutorialTitle"></h2><p id="tutorialText"></p><div class="dialog-actions"><button class="secondary-button" id="tutorialPrevious" type="button">Back</button><button class="primary-button" id="tutorialNext" type="button">Next</button><button class="text-button" id="tutorialSkip" type="button">Close guide</button></div></dialog>
 <footer><span>HANDSpeak / Cavite State University – Imus Campus</span><span>· Capstone prototype · 2026</span></footer>
 <div aria-live="polite" class="toast" id="toast" role="status"></div>
-<script src="guided-experience.js?v=20261123-no-home-navigation" type="module"></script>
-<script src="guest-session.js?v=20261117-removed-services-2" type="module"></script>
-<script src="sign-examples.js?v=20261123-reference-words-six-only-1" type="module"></script>
-<script src="app.js?v=20261124-motion-auto-add" type="module"></script>
+<script src="guided-experience.js?v=20261126-teach-a-sign-2" type="module"></script>
+<script src="sign-examples.js?v=20261126-shared-2" type="module"></script>
+<script src="app.js?v=20261126-clean-overlay-2" type="module"></script>
+<script type="module" src="teach-a-sign.js?v=6"></script>
 </body>
 </html>

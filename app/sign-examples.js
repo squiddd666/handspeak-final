@@ -121,3 +121,41 @@ async function loadPublishedExamples(){
 void loadAccuracyProfiles().then(profiles=>{accuracyProfiles=profiles;updateAccuracy();});
 
 void loadVocabularySettings().then(()=>{for(const button of buttons){button.hidden=Boolean(wordSettings(button.dataset.signExample).hidden);}for(const option of document.querySelectorAll('#practiceWord option'))option.hidden=Boolean(wordSettings(option.value).hidden);for(const card of document.querySelectorAll('[data-daily-word]'))card.hidden=Boolean(wordSettings(card.dataset.dailyWord.toLowerCase()).hidden);if(buttons.find(b=>b.getAttribute('aria-pressed')==='true')?.hidden)buttons.find(b=>!b.hidden)?.click();});
+
+
+// Personal reference videos: persisted as blobs, never embedded in localStorage.
+async function personalVideoLibrary(){
+ const host=document.querySelector('.example-options');if(!host)return;
+ const panel=document.createElement('section');panel.className='personal-video-library';
+ panel.innerHTML=`<h3>Shared reference videos</h3><p>Shared with everyone using this website. No login required. Adding a video does not train recognition.</p><form><label>Word or phrase<input name="label" maxlength="60" required placeholder="e.g. GOOD MORNING"></label><label>Reference video<input name="clip" type="file" accept="video/*" required></label><button class="primary-button" type="submit">Add reference video</button></form><p role="status" class="upload-status"></p><div class="personal-video-list"></div>`;
+ host.append(panel);
+ const message=panel.querySelector('.upload-status'),list=panel.querySelector('.personal-video-list'),form=panel.querySelector('form');
+ let activeUrl=null;
+ async function request(mode,action){
+  const op=action({getAll:()=>({method:'GET'}),put:row=>({method:'POST',row}),delete:id=>({method:'DELETE',id})});
+  const response=await fetch('/api/reference-videos'+(op.id?'/'+op.id:''),{method:op.method,headers:op.row?{'Content-Type':op.row.blob.type,'X-Video-Label':encodeURIComponent(op.row.label)}:{},body:op.row?op.row.blob:undefined});
+  const data=await response.json();if(!response.ok)throw new Error(data.error||'Request failed');return op.method==='GET'?data.videos:data;
+ }
+ async function render(){
+  const rows=await request('readonly',store=>store.getAll());list.replaceChildren();
+  if(!rows.length){list.textContent='No personal reference videos yet.';return;}
+  for(const row of rows){
+   const line=document.createElement('div');line.className='personal-video-row';
+   const watch=document.createElement('button');watch.type='button';watch.className='secondary-button';watch.textContent=row.label;
+   watch.addEventListener('click',()=>{if(activeUrl)URL.revokeObjectURL(activeUrl);activeUrl=row.url;chooseExample(row.label,activeUrl,null,'personal-'+row.id);document.querySelector('#signExampleMode').textContent=row.label+' ? Personal reference video. Train this word in Teach A Sign before recognition practice.';document.querySelector('#signExampleAccuracy').textContent='Personal video ? Recognition accuracy not measured.';});
+   const remove=document.createElement('button');remove.type='button';remove.className='text-button';remove.textContent='Delete';remove.setAttribute('aria-label','Delete reference video for '+row.label);
+   remove.addEventListener('click',async()=>{if(!confirm('Delete reference video for '+row.label+'? Training samples will not be removed.'))return;try{await request('readwrite',store=>store.delete(row.id));if(libraryId==='personal-'+row.id){video.pause();video.removeAttribute('src');video.load();if(activeUrl){URL.revokeObjectURL(activeUrl);activeUrl=null;}status.textContent='Reference video deleted. Choose another word.';}await render();message.textContent='Reference video deleted.';}catch{message.textContent='Could not delete the video.';}});
+   line.append(watch,remove);list.append(line);
+  }
+ }
+ form.addEventListener('submit',async event=>{
+  event.preventDefault();const file=form.elements.clip.files[0],name=form.elements.label.value.trim().replace(/\s+/g,' ').toUpperCase();
+  if(!name||!file)return;
+  if(!file.type.startsWith('video/')){message.textContent='Choose a video file, such as MP4 or WebM.';return;}
+  if(file.size>100*1024*1024){message.textContent='Choose a video smaller than 100 MB.';return;}
+  const submit=form.querySelector('button');submit.disabled=true;message.textContent='Saving video?';
+  try{await request('readwrite',store=>store.put({id:crypto.randomUUID(),label:name,blob:file,created:Date.now()}));await render();form.reset();message.textContent='Video saved. Select its word below to watch.';}catch{message.textContent='Could not upload the video. Check connection and video format.';}finally{submit.disabled=false;}
+ });
+ await render();window.addEventListener('pagehide',()=>{if(activeUrl)URL.revokeObjectURL(activeUrl);});
+}
+personalVideoLibrary().catch(()=>{});

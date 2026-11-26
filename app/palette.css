@@ -92,3 +92,5 @@ body.high-contrast{--page:#fff;--surface:#fff;--text:#000;--secondary:#222;--pri
   .workspace>.saved-message-editor .message-box{min-height:0;height:100%}
 }
 @media(min-width:1051px){.site-header{position:relative}.site-header nav{position:absolute;left:50%;transform:translateX(-50%);justify-content:center}}
+
+.personal-video-library{margin-top:24px;padding-top:20px;border-top:1px solid #CBD5E1;color:#0F172A}.personal-video-library h3{color:#0F172A}.personal-video-library p{color:#475569;font-size:13px}.personal-video-library form{display:grid;gap:12px}.personal-video-library label{display:grid;gap:6px;font-size:14px;font-weight:600}.personal-video-library input{min-width:0;width:100%;box-sizing:border-box;padding:10px;border:1px solid #94A3B8;border-radius:8px;background:#FFFFFF;color:#0F172A}.personal-video-row{display:flex;align-items:center;gap:12px;margin:8px 0}.personal-video-row .text-button{color:#B91C1C}.personal-video-library button:disabled{opacity:.6}

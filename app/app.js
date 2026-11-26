@@ -1,4 +1,5 @@
-import {createLetterCamera} from './letter-camera.js?v=20261113-refined-1';
+import {expandLetterShortcut} from './letter-word-bank.js?v=1';
+const createLetterCamera=()=>{throw new Error('Alternate letter engine is not available; use the standard camera.');};
 import {classifyLetter,letterFeatures,isUsableLetterHand,sameObservedHand,createLetterConsensus} from './letter-recognition.js?v=20261113-refined-1';
 import {createMultiHandMotionLetters} from './motion-letters.js?v=20261111-motion-geometry-1';
 import {createExperienceUI} from './experience-ui.js?v=20261112-feedback-labels-1';
@@ -7,10 +8,10 @@ import {loadVocabularySettings} from './vocabulary-settings.js?v=20261011-featur
 import {createTemporalCamera} from './temporal-camera.js?v=20261112-local-runtime-1';
 import {preferredVisionDelegate} from './camera-performance.js?v=20261010-single-1';
 import {createResearchWords} from './research-words.js?v=20261112-explicit-consent-1';
-import {createVocabularyLibrary} from './vocabulary-library.js?v=20261123-six-word-model-videos';
+import {createVocabularyLibrary} from './vocabulary-library.js?v=20261126-no-camera-accuracy';
 import {appendWord,finishSentence,removeLastWord} from './sentence-builder.js?v=20261002-sentences-1';
 import { createFaceTracker } from './face-tracker.js?v=20261117-github-mint-overlay';
-import { createMotionStudio } from './motion-studio.js?v=20261124-auto-add-1';
+import { createMotionStudio } from './motion-studio.js?v=20261126-match-score';
 import { normalizeLandmarks, classifyFeatures, validSample, DEFAULT_PARAMETERS, validParameters, isUsableHand } from './gesture-model.js?v=20261113-refined-1';
 import {unusedHandNotice} from './hand-notice.js?v=20261113-hand-notice-1';
 import {createLandmarkSmoother,DISPLAY_SMOOTHING} from './landmark-smoothing.js?v=20261116-steady-hand-2';
@@ -20,6 +21,8 @@ import {cameraRequest,describeCamera,createFrameMeter,CAMERA_DEVICE_KEY} from '.
 import {createSignSequence} from './sign-sequence.js?v=20261115-sequence-1';
 import {createPhraseMatcher} from './phrase-bank.js?v=20261115-phrase-bank-1';
 
+let letterShortcutBank={ILY:'I LOVE YOU'};
+fetch('./letter-word-bank.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(bank=>{if(bank&&typeof bank==='object'&&!Array.isArray(bank)){letterShortcutBank=Object.fromEntries(Object.entries(bank).filter(([k,v])=>/^[A-Z]{2,20}$/.test(k)&&typeof v==='string'&&v.length<=100));}}).catch(()=>{});
 const $ = (selector) => document.querySelector(selector);
 // A setting given in the page address (?name=value); null when it is absent.
 const pageOption=name=>typeof URLSearchParams!=='undefined'&&typeof location!=='undefined'?new URLSearchParams(location.search).get(name):null;
@@ -57,10 +60,23 @@ function renderWordChoices(words){
   none.addEventListener('click',()=>{motionStudio.dismissChoices();setRecognitionFeedback('No word added. Sign again when you are ready.');});
   row.replaceChildren(lead,...buttons,none);row.hidden=false;
 }
-function setWordCameraResult(word,detail,daily=false,model=null){
+let wordResultHideTimer=null;
+function setWordCameraResult(word,detail,daily=false,model=null,match=null){
+  let scoreLine=document.querySelector("#wordMatchScore");
+  if(!scoreLine){scoreLine=document.createElement("small");scoreLine.id="wordMatchScore";scoreLine.style.cssText="display:block;margin-top:8px;color:#DBEAFE;font-weight:600";liveResult.append(scoreLine);}
+  const score=match&&Number.isFinite(match.confidence)?100*Math.max(0,Math.min(1,match.confidence)):match&&Number.isFinite(match.distance)?100/(1+Math.max(0,match.distance)):null;
+  scoreLine.hidden=score===null;
+  scoreLine.textContent=score===null?"":`Match score: ${score.toFixed(1)}% ? Not a correctness probability`;
+  scoreLine.title="Template score = 100 / (1 + landmark distance); binary detectors use their raw model score. Scores are not calibrated and are not comparable across model types.";
+  clearTimeout(wordResultHideTimer);
+  if(word && word!=='?'){
+    wordResultHideTimer=setTimeout(()=>{
+      if(recognitionMode==='words' && liveLetter.textContent===word){liveResult.hidden=true;}
+    },2500);
+  }
   setPace(word==='—'?'none':'done');
   liveResult.hidden=word==='—';liveLetter.textContent=word;
-  liveConfidence.textContent=detail||'Possible match — verify before adding';
+  liveConfidence.textContent='';
   vocabularyLibrary?.showCameraAccuracy(model?null:word,{daily,personal:!daily&&motionStudio.hasPersonalWord(word)});
   document.dispatchEvent(new CustomEvent('handspeak:camera-match',{detail:{word,model:model||$('#activeVocabulary').textContent}}));
 }
@@ -303,7 +319,7 @@ const cameraDiagnostic={lastCapture:null,times:[],lastRender:0,rawHands:0,usable
 // Frames the video element receives from the camera (camera-input.js), counted apart from the frames the page processes.
 let frameMeter=null;
 let letterImageLandmarker=null,letterCamera=null,letterHands=[],letterFrameAt=-Infinity,motionCommittedId=null;
-const useLetterWorker=()=>!CANDIDATE_LETTER_MODEL&&typeof Worker!=='undefined'&&new URLSearchParams(location.search).get('letterEngine')==='hybrid';
+const useLetterWorker=()=>false;
 function renderCameraDiagnostic(){
  const times=cameraDiagnostic.times,span=times.length>1?times[times.length-1]-times[0]:0;
  $('#cameraDiagnostics').textContent=JSON.stringify({build:'20261111-architecture-2',recoveryWarning:cameraDiagnostic.recoveryWarning||null,letterWorker:letterCamera?.diagnostics()||null,staticCandidate:cameraDiagnostic.staticCandidate||null,letterMoving:cameraDiagnostic.letterMoving||false,trackerState:cameraDiagnostic.trackerState||'idle',trackerError:cameraDiagnostic.trackerError||null,delegate:handDelegate,processingLagMs:Math.round(temporalLagMs),input:video.videoWidth+'x'+video.videoHeight,camera:cameraDiagnostic.camera||null,cameraFrames:frameMeter?.summary()||null,processedFps:span?Math.round((times.length-1)*10000/span)/10:0,rawHands:cameraDiagnostic.rawHands,usableHands:cameraDiagnostic.usableHands,mode:recognitionMode,vocabulary:$('#activeVocabulary').textContent,model:$('#motionModelStatus').textContent,extraWords:$('#expandedWords').checked,serverPreview:$('#researchWordsToggle').checked,automaticWords:$('#automaticWords').checked,faceTracking:$('#faceTrackingToggle').checked,lastCapture:cameraDiagnostic.lastCapture},null,2);
@@ -456,7 +472,7 @@ const motionStudio=createMotionStudio({
   isRunning:()=>running && recognitionMode==='words',
   onWord:addWord,
   speakAdded:()=>wordOutput==='word',
-  onStatus:(word,detail)=>{if(signSequence)signSequence.add({label:word,source:SIGN_SEQUENCE_SOURCE,confirmed:false});setWordCameraResult(word,detail);setRecognitionFeedback(word==='—'?(detail||'Ready — sign once, then pause.'):`${word} — ${detail||'Possible match; verify before adding.'}`);},
+  onStatus:(word,detail,match)=>{if(signSequence)signSequence.add({label:word,source:SIGN_SEQUENCE_SOURCE,confirmed:false});setWordCameraResult(word,detail,false,null,match);setRecognitionFeedback(word==='—'?(detail||'Ready — sign once, then pause.'):`${word} — ${detail||'Possible match; verify before adding.'}`);},
   speak:speakText,
   automaticCooldownMs:WORD_COOLDOWN_MS,revealDelayMs:WORD_REVEAL_MS,onPace:setWordPace,onChoices:renderWordChoices,
   // Candidate, off without ?wordRetry=1: a capture without a usable sequence does not start the rest period.
@@ -564,7 +580,7 @@ function lettersHelp(){
     recognitionSamples();
     return sampleSets.all.some(sample=>DIGIT_LABELS.has(sample.label)&&!SHARED_LETTER[sample.label])
       ?'Hold a number steady. 0, 2, 6 and 9 are read from the same handshapes as O, V, W and F.'
-      :'Hold a number steady. 0, 2, 6 and 9 can be read now; 1, 3, 4, 5, 7 and 8 need your own samples first (AI Studio).';
+      :'Hold a number steady. 0, 2, 6 and 9 can be read now; 1, 3, 4, 5, 7 and 8 need your own samples first (Teach A Sign).';
   }
   return 'Hold a letter steady. Trace J with your pinky or Z with your index, then pause. After O, V, W or F you can change the letter to 0, 2, 6 or 9; for other numbers choose Numbers.';
 }
@@ -618,17 +634,10 @@ function classifyAI(points,imageAspect=1){
 // earlier model (models/asl-knn.json) is loaded with ?letterModel=bundled; that choice is remembered
 // in this browser so that it survives signing in and reloading, and ?letterModel=candidate returns
 // to the default. The hybrid worker always uses the earlier model, so it runs only with that choice.
-const CANDIDATE_LETTER_MODEL=(()=>{
-  try{
-    const choice=typeof URLSearchParams!=='undefined'&&typeof location!=='undefined'?new URLSearchParams(location.search).get('letterModel'):null;
-    if(choice==='bundled')localStorage.setItem('handspeak-letter-model','bundled');
-    else if(choice==='candidate')localStorage.removeItem('handspeak-letter-model');
-    return localStorage.getItem('handspeak-letter-model')!=='bundled';
-  }catch{return true;}
-})();
+const CANDIDATE_LETTER_MODEL=true;
 async function loadPretrainedModel(){
   try{
-    const response=await fetch(CANDIDATE_LETTER_MODEL?'./models/asl-knn-candidate-v3.json?v=20261113-digits-1':'./models/asl-knn.json?v=20261111-letter-calibrated-1');
+    const response=await fetch('./models/asl-knn-candidate-v3.json?v=20261113-digits-1');
     if(!response.ok)throw new Error('Pretrained model download failed');
     const model=await response.json();
     // A model may also carry samples of hands that are not letters, under the labels it lists as refused.
@@ -754,6 +763,10 @@ $('#removeWordButton').addEventListener('click',()=>{updateSentence(removeLastWo
 function appendCharacter(char){
   if(message.length>=1000){notify('Message limit reached (1000 characters)');return;}
   message += char;
+  if(recognitionMode==='letters'&&signSet==='letters'){
+    const expanded=expandLetterShortcut(message,letterShortcutBank);
+    if(expanded!==message){message=expanded;notify('Letter shortcut expanded');}
+  }
   renderMessage();
 }
 
@@ -771,6 +784,7 @@ function setRecognitionFeedback(text){
 // bar that fills as the hold approaches the commit, then the committed letter as added for
 // ADDED_SHOW_MS. "No reliable match" appears only after NO_MATCH_SHOW_MS without a candidate.
 function showLetterPace(result,now){
+  liveConfidence.hidden=false;
   vocabularyLibrary?.showCameraAccuracy(null);
   liveResult.hidden=false;
   const held=letterConsensus.progress(now);
@@ -803,7 +817,9 @@ function showLetterPace(result,now){
 // Automatic word capture: 'watching' while a sign is being captured, 'checking' between its end
 // and the suggestion, then the bar drains until another capture may start.
 function setWordPace(state){
+  liveConfidence.hidden=false;
   if(state==='watching'||state==='checking'){
+    clearTimeout(wordResultHideTimer);
     liveResult.hidden=false;liveLetter.textContent='…';
     liveConfidence.textContent=state==='watching'?'Watching your sign… pause when you finish':'Checking your sign…';
     setPace(state,0);
@@ -1254,16 +1270,7 @@ function renderMetrics(metrics){
   $('#ratingPerformance').textContent=hasRatings?`${metrics.ratings.performance}/5`:'—';
 }
 
-async function loadSystemData(){
-  const version=++systemLoadVersion;
-  try{
-    const health=await api('/api/health');
-    const [sessions,metrics,gestures]=await Promise.all([api('/api/sessions?limit=20'),api('/api/metrics'),api('/api/gestures')]);
-    if(version!==systemLoadVersion)return;
-    serverAvailable=health.status==='ok';renderHistory(sessions.sessions);renderMetrics(metrics);$('#systemStatus').textContent='Connected · Showing your latest 20 saved messages';
-    if(gestures.gestures.length!==SIGNS.length) console.warn('Gesture database and client classifier differ.');
-  }catch{if(version!==systemLoadVersion)return;serverAvailable=false;$('#systemStatus').textContent='Saved messages are unavailable. Your current message is still on this page. Try Refresh.';}
-}
+async function loadSystemData(){ serverAvailable=false; }
 
 $('#saveButton').addEventListener('click',saveSession);
 $('#refreshHistory').addEventListener('click',async()=>{await loadSystemData();notify(serverAvailable?'History refreshed':'Server is unavailable')});
